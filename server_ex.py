@@ -1,6 +1,5 @@
 import socket            
 import threading
-import os
 import sys
 
 
@@ -35,16 +34,18 @@ def talk(connection, address, msg_buffer, command):
 
   #Client gets a nickname and has its data saved.
   if order == "NEW":
-    nickname = "client_{}".format(client_num)
+    nickname = "u_{}".format(client_num)
     client_list[nickname] = {"files": [], "listening_ip": "", "listening_port": None}
-    clients[connection] = nickname
+    clients[address] = nickname
+    print(clients[address])
     codedSend(connection, "ENTER\n\0")
     return msg_buffer, "ENTER"
 
   #Saves the ip and port  
   elif order == "LISTEN":
+    print(client_list[clients[address]]["listening_ip"])
     client_list[clients[address]]["listening_ip"] = field[1]
-    client_list[clients[address]] ["listening_port"] = field[2]
+    client_list[clients[address]]["listening_port"] = field[2]
 
     codedSend(connection, "OK\n\0")
     return msg_buffer, "OK"
@@ -81,7 +82,7 @@ def talk(connection, address, msg_buffer, command):
       peer_ip = client_list[peer]["listening_ip"]
       peer_port = client_list[peer]["listening_port"]
 
-      msg = "Data: {} {}\n\0".format(int(peer_ip),int(peer_port))
+      msg = "DATA {} {}\n\0".format(int(peer_ip),int(peer_port))
 
       codedSend(connection, msg)
       return msg_buffer, "PEER"
@@ -103,7 +104,6 @@ def client_function(connection, address):
       break
     else:
       msg_buffer += incoming
-
     msg_buffer, command = talk(connection, address, msg_buffer, command)
 
 
@@ -132,7 +132,7 @@ def main():
     connection, address = server_socket.accept()
 
     # create a thread that runs the client_function
-    client_thread = threading.Thread(name="client {}".format(client_counter),
+    client_thread = threading.Thread(name="client {}".format(client_num),
             target=client_function, args=(connection, address))
 
     client_thread.daemon = True
