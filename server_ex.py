@@ -10,16 +10,16 @@ import os
 
 def RetrFile (name, sock):
     filename = sock.recv(1024).decode()
+    print(filename)
     if os.path.isfile(filename):
-        sock.send(("EXISTS " + str(os.path.getsize(filename))).encode())
-        userResponse = sock.recv(1024).decode()
-        if userResponse[:2] == 'OK':
-            with open(filename, 'rb') as f:
+        sock.send("EXISTS".encode())
+        with open(filename, 'rb') as f:
+            sock.send(str(os.path.getsize(filename)).encode())
+            bytesToSend = f.read(1024)
+            sock.send(bytesToSend)
+            while bytesToSend != "":
                 bytesToSend = f.read(1024)
                 sock.send(bytesToSend)
-                while bytesToSend != "":
-                    bytesToSend = f.read(1024)
-                    sock.send(bytesToSend)
     else:
         sock.send("ERR".encode())
 
