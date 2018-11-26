@@ -125,15 +125,15 @@ while (True):
     print("2.- Exit.")
     print("3.- Tests")
     ans = input()
-    if ans == "1":
-        file = input("Please, select the name of the file you want to search and download.")
+
+    if (ans=="1"):
+        file = input("Please, select the name of the file you want to search and download.\n")
         s.connect((host, port))
         rev_dec = s.recv(1024).decode()
         print(rev_dec)
         fileEncode = file.encode()
+        s.sendall(fileEncode)
         s.send(fileEncode)
-        s.close
-    elif ans == "3":
         s.connect((host, port))
         filename = input("Which file do you want? (type 'q' to quit) -> ")
         if filename != 'q':
