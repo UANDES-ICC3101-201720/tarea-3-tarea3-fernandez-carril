@@ -1,11 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Nov 24 19:43:15 2018
-
-@author: carri
-"""
-
 import socket               # Import socket module
+import threading
+import os
+
+def checkFile(name, sock):
+    filename = sock.recv(1024)
+    if os.path.isfile(filename):
+        response = ("EXISTS " + str(os.path.getsize(filename)))
+        response = response.encode()
+        sock.send(response)
+
 
 s = socket.socket()         # Create a socket object
 host = socket.gethostname()  # Get local machine name
@@ -18,13 +21,13 @@ while(True):
     print("2.- Exit.")
     ans = input()
     if (ans=="1"):
-        file = input("Please, select the name of the file you want to search and download.")
+        file = input("Please, select the name of the file you want to search and download.\n")
         s.connect((host, port))
         rev_dec = s.recv(1024).decode()
         print(rev_dec)
         fileEncode = file.encode()
-        s.send(fileEncode)
-        s.close
-
+        s.sendall(fileEncode)
+    if (ans=="2"):
+        break
 
 
