@@ -82,7 +82,7 @@ def talk(connection, address, msg_buffer, command):
       peer_ip = client_list[peer]["listening_ip"]
       peer_port = client_list[peer]["listening_port"]
 
-      msg = "Data: {} {}\n\0".format(int(peer_ip),int(peer_port))
+      msg = "DATA {} {}\n\0".format(int(peer_ip),int(peer_port))
 
       codedSend(connection, msg)
       return msg_buffer, "PEER"

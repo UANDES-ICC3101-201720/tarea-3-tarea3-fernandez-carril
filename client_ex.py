@@ -2,55 +2,70 @@ import socket               # Import socket module
 import threading
 import os
 import sys
+import Queue
+from threading import Thread
 
-def checkFile(name, sock):
-    filename = sock.recv(1024)
-    if os.path.isfile(filename):
-        response = ("EXISTS " + str(os.path.getsize(filename)))
-        response = response.encode()
-        sock.send(response)
+file_list = []
+requested_file = ""
 
 
-s = socket.socket()  # Create a socket object
-host = socket.gethostname()  # Get local machine name
-port = 12345  # Reserve a port for your service.
+def codedSend(connection, message):
+    message = message.encode()
+    try:
+        connection.sendall(message)
+    except socket.error:
+        logging.error("error, send_message")
+        sys.exit(-1)
 
-print("Welcome to our P2P media sharing platform!")
-while (True):
-    print("Select your option:")
-    print("1.- Find a File.")
-    print("2.- Exit.")
-    print("3.- Tests")
-    ans = input()
 
-    if (ans=="1"):
-        file = input("Please, select the name of the file you want to search and download.\n")
-        s.connect((host, port))
-        rev_dec = s.recv(1024).decode()
-        print(rev_dec)
-        fileEncode = file.encode()
-        s.sendall(fileEncode)
-        s.send(fileEncode)
-        s.connect((host, port))
-        filename = input("Which file do you want? (type 'q' to quit) -> ")
-        if filename != 'q':
-            s.send(filename.encode())
-            server_resp = s.recv(1024).decode()
-            if server_resp == 'EXISTS':
-                file_size = int(s.recv(1024).decode())
-                message = input("File Exists " + str(file_size) +
-                                " Bytes, download? (y/n) -> ")
-                if message == 'y':
-                    f = open('d_' + filename, 'wb')
-                    data = s.recv(1024)
-                    totalRecv = sys.getsizeof(data)
-                    f.write(data)
-                    while totalRecv < file_size:
-                        data = s.recv(1024)
-                        totalRecv += len(data)
-                        f.write(data)
-                    f.close()
-                    print("download successful")
+
+def talk(server, msg_buffer, command):
+    global file_list
+    global requested_file
+
+    if "\0" not in msg_buffer:
+        msg_buffer += server.recv(4096).decode()
+        return talk(server, msg_buffer, command)
+    else:
+        index = msg_buffer.index("\0")
+        message = msg_buffer[0:index-1]
+        msg_buffer = msg_buffer[index+1:]
+
+    line = message.split("\n")
+    field = line[0].split()
+    order = field[0]
+
+    if order == "NEW":
+        print("You succesfully joined the server")
+
+        return None, msg_buffer
+
+    elif order == "FULLLIST" and command == "SENDLIST":
+        count = int(field[1])
+
+        if count != (len(line) - 1):
+            codedSend(server, "ERROR\n\0")
+            sys.exit(-1)
         else:
-            print("File doesn't exist!")
-s.close()
+            file_list = line[1:]
+
+            print("FILE LIST:")
+            for l in line[1:]:
+                print(str(l))
+
+        return None, msg_buffer
+
+    elif order == "OK" and command in ("LIST", "LISTENING"):
+        return None, msg_buffer
+
+    elif order == "DATA" and command == "PEER":
+        peer_ip = field[1]
+        peer_port = int(field[2])
+
+        return(peer_ip, peer_port), msg_buffer
+
+    elif order == "ERROR":
+        sys.exit(-1)
+    else:
+        sys.exit(-1)
+
