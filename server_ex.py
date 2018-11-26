@@ -1,6 +1,5 @@
 import socket            
 import threading
-import os
 import sys
 
 
@@ -13,7 +12,6 @@ def codedSend(connection, message):
     try:
         connection.sendall(message)
     except socket.error:
-        logging.error("error, send_message")
         sys.exit(-1)
 
 
@@ -36,16 +34,18 @@ def talk(connection, address, msg_buffer, command):
 
   #Client gets a nickname and has its data saved.
   if order == "NEW":
-    nickname = "client_{}".format(client_num)
+    nickname = "u_{}".format(client_num)
     client_list[nickname] = {"files": [], "listening_ip": "", "listening_port": None}
     clients[connection] = nickname
+    print(clients[connection])
     codedSend(connection, "ENTER\n\0")
     return msg_buffer, "ENTER"
 
   #Saves the ip and port  
   elif order == "LISTEN":
+    print(client_list[clients[address]]["listening_ip"])
     client_list[clients[address]]["listening_ip"] = field[1]
-    client_list[clients[address]] ["listening_port"] = field[2]
+    client_list[clients[address]]["listening_port"] = field[2]
 
     codedSend(connection, "OK\n\0")
     return msg_buffer, "OK"
@@ -90,7 +90,6 @@ def talk(connection, address, msg_buffer, command):
       codedSend(connection, "EMPTY\n\0")
       return msg_buffer, "EMPTY"
   elif order == "ERROR":
-    logging.warning("ERROR message received, exiting")
     sys.exit(-1)
 
 
@@ -105,7 +104,6 @@ def client_function(connection, address):
       break
     else:
       msg_buffer += incoming
-
     msg_buffer, command = talk(connection, address, msg_buffer, command)
 
 
@@ -121,13 +119,11 @@ def main():
   try:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   except socket.error:
-    logging.error("socket.socket error")
     sys.exit(-1)
 
   try:
     server_socket.bind( (host, port) )
   except socket.error:
-    logging.error("port {} in use, exiting".format(port))
     sys.exit(-1)
 
   print('Server started')
@@ -136,7 +132,7 @@ def main():
     connection, address = server_socket.accept()
 
     # create a thread that runs the client_function
-    client_thread = Thread(name="client {}".format(client_counter),
+    client_thread = threading.Thread(name="client {}".format(client_num),
             target=client_function, args=(connection, address))
 
     client_thread.daemon = True
