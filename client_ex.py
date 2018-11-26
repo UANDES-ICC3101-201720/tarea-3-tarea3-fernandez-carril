@@ -106,10 +106,13 @@ listening_port = 0
 sharing_directory = os.path.dirname(os.path.abspath(__file__)) + "\\sharing"
 files_list = [file_ for file_ in os.listdir(sharing_directory) if os.path.isfile(os.path.join(sharing_directory, file_))]
 print("Welcome to our P2P media sharing platform!")
-inc_buffer = ""
+incoming_buffer = ""
 s.connect(host, port)
 s.send("NEW")
-s.recv()
+confirmation = s.recv(1024).decode()
+if confirmation == "OK":
+    print("...")
+
 queue = queue.Queue()
 listening_thread = threading.Thread(name="ListeningThread", target=listen,
             args=(listening_ip, listening_port, queue))
@@ -118,7 +121,19 @@ listening_thread.start()
 listening_ip, listening_port = queue.get()
 listening_message = "LISTENING {} {}\n\0".format(listening_ip, listening_port)
 send_message(s, listening_message)
-converse(server, incoming_buffer, "LISTENING")
+converse(s, incoming_buffer, "LISTENING")
+
+
+list_message = "LIST {}\n".format(len(files_list))
+for file_ in files_list:
+    list_message += file_ + "\n"
+list_message += "\0"
+send_message(s, list_message)
+
+
+send_message(server, "SENDLIST " + "\n\0")
+converse(server, incoming_buffer, "SENDLIST")
+converse(s, inc_buffer, "LIST")
 while (True):
     print("Select your option:")
     print("1.- Find a File.")

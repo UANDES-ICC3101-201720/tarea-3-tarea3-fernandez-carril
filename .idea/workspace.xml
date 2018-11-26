@@ -22,8 +22,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client_ex.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1227">
-              <caret line="66" column="10" lean-forward="true" selection-start-line="66" selection-start-column="10" selection-end-line="66" selection-end-column="10" />
+            <state relative-caret-position="374">
+              <caret line="112" column="24" lean-forward="true" selection-start-line="112" selection-start-column="24" selection-end-line="112" selection-end-column="24" />
               <folding>
                 <element signature="e#13#50#0" expanded="true" />
               </folding>
@@ -34,7 +34,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server_ex.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
+            <state relative-caret-position="1068">
               <caret line="134" column="21" selection-start-line="134" selection-start-column="21" selection-end-line="134" selection-end-column="21" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -46,8 +46,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://D:/Downloads/P2P_file_sharing-master/P2P_file_sharing-master/client/client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6902">
-              <caret line="427" selection-start-line="427" selection-end-line="427" selection-end-column="50" />
+            <state relative-caret-position="156">
+              <caret line="50" column="35" lean-forward="true" selection-start-line="50" selection-start-column="35" selection-end-line="50" selection-end-column="35" />
               <folding>
                 <element signature="e#139#176#0" expanded="true" />
               </folding>
@@ -58,8 +58,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://D:/Downloads/P2P_file_sharing-master/P2P_file_sharing-master/library/library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="29" selection-start-line="29" selection-end-line="36" selection-end-column="44" />
+            <state relative-caret-position="48">
+              <caret line="29" column="17" lean-forward="true" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
               <folding>
                 <element signature="e#139#176#0" expanded="true" />
               </folding>
@@ -84,6 +84,7 @@
       <find>connection_init</find>
       <find>send_message</find>
       <find>Queue</find>
+      <find>incoming</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -98,10 +99,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="width" value="977" />
-    <option name="height" value="1088" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="2470" />
+    <option name="y" value="379" />
+    <option name="width" value="783" />
+    <option name="height" value="870" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -239,19 +241,18 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1543182780560</updated>
-      <workItem from="1543182783628" duration="24874000" />
+      <workItem from="1543182783628" duration="27975000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="24874000" />
+    <option name="totallyTimeSpent" value="27975000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
-    <editor active="true" />
+    <frame x="1912" y="-8" width="1936" height="1096" extended-state="7" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08120805" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.06449893" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" />
@@ -260,8 +261,8 @@
       <window_info anchor="bottom" id="Terminal" weight="0.32841823" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3243968" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.2554517" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3243968" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -326,18 +327,8 @@
     </entry>
     <entry file="file://D:/Downloads/P2P_file_sharing-master/P2P_file_sharing-master/library/library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="29" selection-start-line="29" selection-end-line="36" selection-end-column="44" />
-          <folding>
-            <element signature="e#139#176#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Downloads/P2P_file_sharing-master/P2P_file_sharing-master/client/client.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6902">
-          <caret line="427" selection-start-line="427" selection-end-line="427" selection-end-column="50" />
+        <state relative-caret-position="48">
+          <caret line="29" column="17" lean-forward="true" selection-start-line="29" selection-start-column="17" selection-end-line="29" selection-end-column="17" />
           <folding>
             <element signature="e#139#176#0" expanded="true" />
           </folding>
@@ -346,7 +337,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server_ex.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
+        <state relative-caret-position="1068">
           <caret line="134" column="21" selection-start-line="134" selection-start-column="21" selection-end-line="134" selection-end-column="21" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
@@ -354,10 +345,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://D:/Downloads/P2P_file_sharing-master/P2P_file_sharing-master/client/client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="50" column="35" lean-forward="true" selection-start-line="50" selection-start-column="35" selection-end-line="50" selection-end-column="35" />
+          <folding>
+            <element signature="e#139#176#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client_ex.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1227">
-          <caret line="66" column="10" lean-forward="true" selection-start-line="66" selection-start-column="10" selection-end-line="66" selection-end-column="10" />
+        <state relative-caret-position="374">
+          <caret line="112" column="24" lean-forward="true" selection-start-line="112" selection-start-column="24" selection-end-line="112" selection-end-column="24" />
           <folding>
             <element signature="e#13#50#0" expanded="true" />
           </folding>
