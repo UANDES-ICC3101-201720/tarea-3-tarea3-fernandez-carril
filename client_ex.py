@@ -1,6 +1,7 @@
 import socket               # Import socket module
 import threading
 import os
+import sys
 
 def checkFile(name, sock):
     filename = sock.recv(1024)
@@ -21,6 +22,7 @@ while (True):
     print("2.- Exit.")
     print("3.- Tests")
     ans = input()
+
     if (ans=="1"):
         file = input("Please, select the name of the file you want to search and download.\n")
         s.connect((host, port))
@@ -29,27 +31,25 @@ while (True):
         fileEncode = file.encode()
         s.sendall(fileEncode)
         s.send(fileEncode)
-    elif (ans == "3"):
         s.connect((host, port))
         filename = input("Which file do you want? (type 'q' to quit) -> ")
         if filename != 'q':
             s.send(filename.encode())
-            data = s.recv(1024)
-            dec_data = data.decode()
-            if dec_data[:6] == 'EXISTS':
-                filesize = len(data)
-                message = input("File Exists " + str(filesize) +
+            server_resp = s.recv(1024).decode()
+            if server_resp == 'EXISTS':
+                file_size = int(s.recv(1024).decode())
+                message = input("File Exists " + str(file_size) +
                                 " Bytes, download? (y/n) -> ")
                 if message == 'y':
-                    s.send('OK'.encode())
                     f = open('d_' + filename, 'wb')
                     data = s.recv(1024)
-                    totalRecv = len(data)
+                    totalRecv = sys.getsizeof(data)
                     f.write(data)
-                    while totalRecv < filesize:
-                        data = s.recv(1024).decode()
+                    while totalRecv < file_size:
+                        data = s.recv(1024)
                         totalRecv += len(data)
                         f.write(data)
+                    f.close()
                     print("download successful")
         else:
             print("File doesn't exist!")
