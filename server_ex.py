@@ -82,7 +82,7 @@ def talk(connection, address, msg_buffer, command):
       peer_ip = client_list[peer]["listening_ip"]
       peer_port = client_list[peer]["listening_port"]
 
-      msg = "DATA {} {}\n\0".format(int(peer_ip),int(peer_port))
+      msg = "DATA {} {}\n\0".format(peer_ip, peer_port)
 
       codedSend(connection, msg)
       return msg_buffer, "PEER"
@@ -101,7 +101,6 @@ def client_function(connection, address):
   while True:
     incoming = connection.recv(4096)
     incoming = incoming.decode()
-    print(incoming)
     if len(incoming) == 0:
       break
     else:
@@ -115,8 +114,8 @@ def main():
   global clients
   global client_num
 
-  host = "MSI" 
-  port = 45000
+  host = "MSI" #Cambiar al adecuado
+  port = 45000 #Cambiar al adecuado
 
   try:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

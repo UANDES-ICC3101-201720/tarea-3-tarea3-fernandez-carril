@@ -80,7 +80,7 @@ def peer_function(connection, address):
     inc_buffer = ""
 
     while True:
-        # parse message
+        
         while "\0" not in inc_buffer:
             msg = connection.recv(4096).decode()
             inc_buffer += msg
@@ -91,22 +91,20 @@ def peer_function(connection, address):
 
         fields = message.split()
         command = fields[0]
-        # handle and respond to the message
         if command == "GIVE":
             file_ = sharing_directory + "/" + fields[1]
 
             if os.path.isfile(file_):
-                # get the file size
                 file_size = os.path.getsize(file_)
                 send_message(connection, "TAKE {}\n\0".format(str(file_size)))
                 file__ = open(file_, "rb")
-                file_buffer = ""
                 file_buffer = file__.read(1024)
+                print("sending file")
                 while file_buffer:
-                    print("sending: " + file_buffer.decode())
                     connection.send(file_buffer)
                     file_buffer = file__.read(1024)
                 file__.close()
+                print("File Sent!")
             else:
                 send_message(connection, "ERROR\n\0")
                 connection.close()
@@ -148,13 +146,13 @@ def give_me(peer):
     if command == "TAKE":
         file_size = field[1]
 
-        # get the file
-        while len(inc_buffer) < int(file_size):
-            msg = peer.recv(4096).decode()
-            inc_buffer += msg
-
+        bytes_written = 0
         file_to_save = open(sharing_directory + "/" + requested_file, "wb")
-        file_to_save.write(inc_buffer)
+        while bytes_written < int(file_size):
+            msg = peer.recv(4096)
+            file_to_save.write(msg)
+            bytes_written += sys.getsizeof(msg)
+
         file_to_save.close()
 
         send_message(peer, "OK\n\0")
@@ -177,13 +175,10 @@ def listen(listening_ip, listening_port, queue):
         listening_socket.bind((listening_ip, listening_port))
     except socket.error:
         sys.exit(-1)
-    # listen for incoming connections
+
     listening_socket.listen(5)
-    # cli_output
     listening_port = listening_socket.getsockname()[1]
-    # pass the listening_ip and listening_port to the main thread
     queue.put((listening_ip, listening_port))
-    # handle incoming peer connections
     peer_counter = 0
     while True:
         connection, address = listening_socket.accept()
@@ -195,9 +190,9 @@ def listen(listening_ip, listening_port, queue):
         peer_counter += 1
 
 
-s = socket.socket()  # Create a socket object
-host = socket.gethostname()  # Get local machine name
-port = 45000  # Reserve a port for your service.
+s = socket.socket()
+host = "MSI"  # Cambiar al host del Server
+port = 45000  # Cambiar al adecuado
 listening_ip = socket.gethostname()
 listening_port = 0
 sharing_directory = os.path.dirname(os.path.abspath(__file__)) + "\\sharing"
