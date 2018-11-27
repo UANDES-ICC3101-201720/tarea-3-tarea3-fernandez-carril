@@ -149,12 +149,13 @@ def give_me(peer):
         file_size = field[1]
 
         # get the file
-        while len(inc_buffer) < int(file_size):
-            msg = peer.recv(4096).decode()
-            inc_buffer += msg
-
+        bytes_written = 0
         file_to_save = open(sharing_directory + "/" + requested_file, "wb")
-        file_to_save.write(inc_buffer)
+        while bytes_written < int(file_size):
+            msg = peer.recv(4096)
+            file_to_save.write(msg)
+            bytes_written += sys.getsizeof(msg)
+
         file_to_save.close()
 
         send_message(peer, "OK\n\0")
@@ -196,7 +197,7 @@ def listen(listening_ip, listening_port, queue):
 
 
 s = socket.socket()  # Create a socket object
-host = socket.gethostname()  # Get local machine name
+host = "MSI" # Get local machine name
 port = 45000  # Reserve a port for your service.
 listening_ip = socket.gethostname()
 listening_port = 0
