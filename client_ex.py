@@ -15,8 +15,6 @@ def codedSend(connection, message):
     except socket.error:
         sys.exit(-1)
 
-
-
 def talk(server, msg_buffer, command):
     global file_list
     global requested_file
@@ -77,24 +75,19 @@ def send_message(connection, message):
 
 
 def peer_function(connection, address):
-    """
-    connect to a peer
-
-    connection : connection socket
-    address : (IP_address, port)
-    """
     global sharing_directory
 
-    incoming_buffer = ""
+    inc_buffer = ""
 
     while True:
         # parse message
-        while "\0" not in incoming_buffer:
-            incoming_buffer += connection.recv(4096)
+        while "\0" not in inc_buffer:
+            msg = connection.recv(4096).decode()
+            inc_buffer += msg
 
-        index = incoming_buffer.index("\0")
-        message = incoming_buffer[0:index-1]
-        incoming_buffer = incoming_buffer[index+1:]
+        index = inc_buffer.index("\0")
+        message = inc_buffer[0:index-1]
+        inc_buffer = inc_buffer[index+1:]
 
         fields = message.split()
         command = fields[0]
@@ -110,7 +103,7 @@ def peer_function(connection, address):
                 file_buffer = ""
                 file_buffer = file__.read(1024)
                 while file_buffer:
-                    print("sending: " + file_buffer)
+                    print("sending: " + file_buffer.decode())
                     connection.send(file_buffer)
                     file_buffer = file__.read(1024)
                 file__.close()
@@ -119,7 +112,7 @@ def peer_function(connection, address):
                 connection.close()
                 break
 
-        elif command == "THANKS":
+        elif command == "OK":
             connection.close()
             break
 
@@ -130,11 +123,51 @@ def peer_function(connection, address):
 
     return
 
+def give_me(peer):
+    global requested_file
+
+    print()
+    print("Please insert the name of the file you wish to download:")
+    requested_file =  input()
+
+    send_message(peer, "GIVE {}\n\0".format(requested_file))
+
+    inc_buffer = ""
+
+    while "\0" not in inc_buffer:
+        msg = peer.recv(4096).decode()
+        inc_buffer += msg
+
+    index = inc_buffer.index("\0")
+    message = inc_buffer[0:index-1]
+    inc_buffer = inc_buffer[index+1:]
+
+    field = message.split()
+    command = field[0]
+
+    if command == "TAKE":
+        file_size = field[1]
+
+        # get the file
+        while len(inc_buffer) < int(file_size):
+            msg = peer.recv(4096).decode()
+            inc_buffer += msg
+
+        file_to_save = open(sharing_directory + "/" + requested_file, "wb")
+        file_to_save.write(inc_buffer)
+        file_to_save.close()
+
+        send_message(peer, "OK\n\0")
+        peer.close()
+
+    elif command == "ERROR":
+        return
+
+    else:
+        sys.exit(-1)
+
 
 def listen(listening_ip, listening_port, queue):
-    """
-    create a server socket and start listening for incoming connections
-    """
     try:
         listening_socket = socket.socket()
     except socket.error:
@@ -195,38 +228,44 @@ send_message(s, list_message)
 talk(s, inc_buffer, "FILES")
 print("Server received file info")
 
+print("Current Files available: ")
 send_message(s, "FILE_LIST " + "\n\0")
 talk(s, inc_buffer, "FILE_LIST")
 
+print("Setup complete! Please select your option: ")
 while True:
         print()
-        print("options:")
-        print("1: SENDLIST : request the list of clients and shared files")
-        print("2: WHERE : request the IP address and port of the specified client")
-        print("5: QUIT : exit the program")
+        print("Options:")
+        print("1: File List : Lets you see the files available for download")
+        print("2: Peer : request the IP address and port of the specified peer")
+        print("3: exit the program")
 
         option = input()
-        if option in ["1", "sendlist", "SENDLIST"]:
-            send_message(s, "SENDLIST " + "\n\0")
+        if option in ["1", "file list", "FILE LIST", "list", "LIST", "file", "FILE"]:
+            send_message(s, "FILE_LIST " + "\n\0")
+            talk(s, inc_buffer, "FILE_LIST")
 
-            talk(s, inc_buffer, "SENDLIST")
-
-        elif option in ["2", "where", "WHERE"]:
-            print("Enter the username of the client:")
+        elif option in ["2", "peer", "PEER"]:
+            print("Enter the name of the user (client_#):")
 
             client = input()
+            send_message(s, "PEER " + client + "\n\0")
+            (peer_ip, peer_port), inc_buffer = talk(s, inc_buffer, "PEER")
 
-            print("{} is an invalid client username, try again: ".format(client))
+            try:
+                peer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            except socket.error:
+                sys.exit(-1)
 
-            send_message(s, "WHERE " + client + "\n\0")
+            try:
+                peer.connect((peer_ip, peer_port))
+            except socket.error:
+                sys.exit(-1)
 
-            (peer_ip, peer_port), incoming_buffer = talk(s, inc_buffer, "WHERE")
-
-            peer = connection_init( (peer_ip, peer_port) )
 
             give_me(peer)
 
-        elif option in ["5", "quit", "QUIT"]:
+        elif option in ["3", "quit", "QUIT"]:
             sys.exit(0)
 
         else:
