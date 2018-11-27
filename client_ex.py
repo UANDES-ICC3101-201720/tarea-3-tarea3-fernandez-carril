@@ -13,7 +13,6 @@ def codedSend(connection, message):
     try:
         connection.sendall(message)
     except socket.error:
-        logging.error("error, send_message")
         sys.exit(-1)
 
 
@@ -34,12 +33,12 @@ def talk(server, msg_buffer, command):
     field = line[0].split()
     order = field[0]
 
-    if order == "NEW":
+    if order == "ENTER":
         print("You succesfully joined the server")
 
         return None, msg_buffer
 
-    elif order == "FULLLIST" and command == "SENDLIST":
+    elif order == "FULLLIST" and command == "FILE_LIST":
         count = int(field[1])
 
         if count != (len(line) - 1):
@@ -54,7 +53,7 @@ def talk(server, msg_buffer, command):
 
         return None, msg_buffer
 
-    elif order == "OK" and command in ("LIST", "LISTENING"):
+    elif order == "OK" and command in ("FILES", "LISTEN"):
         return None, msg_buffer
 
     elif order == "DATA" and command == "PEER":
@@ -174,6 +173,7 @@ print("Welcome to our P2P media sharing platform!")
 inc_buffer = ""
 s.connect((host, port))
 s.send("NEW\n\0".encode())
+unneeded, inc_buffer = talk(s, inc_buffer, "NEW")
 queue = queue.Queue()
 listening_thread = threading.Thread(name="ListeningThread", target=listen,
             args=(listening_ip, listening_port, queue))
@@ -181,42 +181,55 @@ listening_thread.daemon = True
 listening_thread.start()
 listening_ip, listening_port = queue.get()
 listening_message = "LISTEN {} {}\n\0".format(listening_ip, listening_port)
+
 send_message(s, listening_message)
 talk(s, inc_buffer, "LISTEN")
-while (True):
-    print("Select your option:")
-    print("1.- Find a File.")
-    print("2.- Exit.")
-    print("3.- Tests")
-    ans = input()
+print("Server is correctly listening")
 
-    if (ans=="1"):
-        file = input("Please, select the name of the file you want to search and download.\n")
-        s.connect((host, port))
-        rev_dec = s.recv(1024).decode()
-        print(rev_dec)
-        fileEncode = file.encode()
-        s.sendall(fileEncode)
-        s.send(fileEncode)
-        s.connect((host, port))
-        filename = input("Which file do you want? (type 'q' to quit) -> ")
-        if filename != 'q':
-            s.send(filename.encode())
-            server_resp = s.recv(1024).decode()
-            if server_resp == 'EXISTS':
-                file_size = int(s.recv(1024).decode())
-                message = input("File Exists " + str(file_size) +
-                                " Bytes, download? (y/n) -> ")
-                if message == 'y':
-                    f = open('d_' + filename, 'wb')
-                    data = s.recv(1024)
-                    totalRecv = sys.getsizeof(data)
-                    f.write(data)
-                    while totalRecv < file_size:
-                        data = s.recv(1024)
-                        totalRecv += len(data)
-                        f.write(data)
-                    f.close()
-                    print("download successful")
+
+list_message = "FILES {}\n".format(len(files_list))
+for file in files_list:
+    list_message += file + "\n"
+list_message += "\0"
+send_message(s, list_message)
+talk(s, inc_buffer, "FILES")
+print("Server received file info")
+
+send_message(s, "FILE_LIST " + "\n\0")
+talk(s, inc_buffer, "FILE_LIST")
+
+while True:
+        print()
+        print("options:")
+        print("1: SENDLIST : request the list of clients and shared files")
+        print("2: WHERE : request the IP address and port of the specified client")
+        print("5: QUIT : exit the program")
+
+        option = input()
+        if option in ["1", "sendlist", "SENDLIST"]:
+            send_message(s, "SENDLIST " + "\n\0")
+
+            talk(s, inc_buffer, "SENDLIST")
+
+        elif option in ["2", "where", "WHERE"]:
+            print("Enter the username of the client:")
+
+            client = input()
+
+            print("{} is an invalid client username, try again: ".format(client))
+
+            send_message(s, "WHERE " + client + "\n\0")
+
+            (peer_ip, peer_port), incoming_buffer = talk(s, inc_buffer, "WHERE")
+
+            peer = connection_init( (peer_ip, peer_port) )
+
+            give_me(peer)
+
+        elif option in ["5", "quit", "QUIT"]:
+            sys.exit(0)
+
+        else:
+            print("invalid option, try again")
 
 

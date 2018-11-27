@@ -34,10 +34,9 @@ def talk(connection, address, msg_buffer, command):
 
   #Client gets a nickname and has its data saved.
   if order == "NEW":
-    nickname = "u_{}".format(client_num)
+    nickname = "client_{}".format(client_num)
     client_list[nickname] = {"files": [], "listening_ip": "", "listening_port": None}
-    clients[connection] = nickname
-    print(clients[connection])
+    clients[address] = nickname
     codedSend(connection, "ENTER\n\0")
     return msg_buffer, "ENTER"
 
@@ -66,7 +65,7 @@ def talk(connection, address, msg_buffer, command):
     count = 0
     for client in client_list:
       count += len(client_list[client]["files"])
-    msg = "Total Files {}\n".format(str(count))
+    msg = "FULLLIST {}\n".format(str(count))
     for client in client_list:
       for file in client_list[client]["files"]:
         msg += str(client) + " " + str(file) + "\n"
@@ -99,7 +98,9 @@ def client_function(connection, address):
   command = ""
 
   while True:
-    incoming = connection.recv(4096).decode()
+    incoming = connection.recv(4096)
+    incoming = incoming.decode()
+    print(incoming)
     if len(incoming) == 0:
       break
     else:
