@@ -37,6 +37,7 @@ def talk(connection, address, msg_buffer, command):
     nickname = "client_{}".format(client_num)
     client_list[nickname] = {"files": [], "listening_ip": "", "listening_port": None}
     clients[address] = nickname
+
     codedSend(connection, "ENTER\n\0")
     return msg_buffer, "ENTER"
 
